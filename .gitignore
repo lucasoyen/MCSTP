@@ -1,41 +1,32 @@
-# OS files
-.DS_Store
-Thumbs.db
-Desktop.ini
-
-# Editor/IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# Environment
-.env
-.env.*
-!.env.example
-
-# Node
-node_modules/
-dist/
+# Gradle
+.gradle/
 build/
-*.tgz
+gradle/wrapper/gradle-wrapper.jar
 
-# Python
-__pycache__/
-*.py[cod]
-venv/
-.venv/
-*.egg-info/
+# IDE
+.idea/
+*.iml
+.vscode/
+*.launch
+.settings/
+.classpath
+.project
+bin/
 
-# Rust
-target/
-
-# Logs
-*.log
+# Fabric
+run/
 logs/
 
-# Coverage/testing
-coverage/
-.nyc_output/
-htmlcov/
+# OS
+.DS_Store
+Thumbs.db
+
+# Python
+python/__pycache__/
+python/src/*.egg-info/
+python/.venv/
+python/venv/
+*.pyc
+
+# Claude
+.claude/
