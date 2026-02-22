@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "mcstp",
+  "version": "${version}",
+  "name": "MCSTP",
+  "description": "Minecraft State Transfer Protocol - Game state telemetry via WebSocket",
+  "authors": ["Forkei"],
+  "contact": {},
+  "license": "MIT",
+  "icon": "",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["com.mcstp.MCSTPMod"],
+    "client": ["com.mcstp.MCSTPClient"]
+  },
+  "mixins": [
+    "mcstp.mixins.json",
+    {
+      "config": "mcstp.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "mcctp": ">=1.0.0",
+    "fabricloader": ">=0.16.0",
+    "minecraft": "~1.21.11",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
