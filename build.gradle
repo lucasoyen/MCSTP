@@ -31,7 +31,7 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
     // Depend on MCCTP - use the built JAR
-    modImplementation files("../mcctp/build/libs/mcctp-1.0.0.jar")
+    modImplementation files("../mcctp/build/libs/mcctp-1.1.0.jar")
 
     // Netty HTTP codec (bundled via MCCTP at runtime, needed for compile)
     implementation "io.netty:netty-codec-http:4.1.97.Final"

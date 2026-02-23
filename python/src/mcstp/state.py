@@ -262,3 +262,128 @@ class GameState:
             "screen_open": self.screen_state.screen_open,
             "screen_type": self.screen_state.screen_type,
         }
+
+
+def flatten_state(nested: dict) -> dict:
+    """Flatten a nested MCSTP game_state dict into a flat dict.
+
+    Converts from the nested WebSocket format::
+
+        {"playerState": {"health": 20, ...}, "playerInput": {"movementForward": 1, ...}}
+
+    To a flat dict with consumer-friendly keys::
+
+        {"health": 20, "movementForward": 1, "is_sprinting": True, ...}
+
+    If the dict is already flat (no nested sections), returns it unchanged.
+    """
+    if not nested:
+        return {}
+
+    # Detect if already flat (no nested sections)
+    if "playerState" not in nested and "playerInput" not in nested:
+        return nested
+
+    flat: dict = {}
+
+    # Top-level
+    for key in ("type", "timestamp"):
+        if key in nested:
+            flat[key] = nested[key]
+    flat["selected_slot"] = nested.get("selectedSlot", 0)
+    flat["selectedSlot"] = nested.get("selectedSlot", 0)
+
+    # heldItem
+    hi = nested.get("heldItem", {})
+    flat["held_item"] = hi.get("name", "minecraft:air")
+    flat["held_item_category"] = hi.get("category", "EMPTY")
+
+    # offhandItem
+    oh = nested.get("offhandItem", {})
+    flat["offhand_item"] = oh.get("name", "minecraft:air")
+    flat["offhand_category"] = oh.get("category", "EMPTY")
+
+    # playerState
+    ps = nested.get("playerState", {})
+    flat["health"] = ps.get("health", 20.0)
+    flat["maxHealth"] = ps.get("maxHealth", 20.0)
+    flat["hunger"] = ps.get("hunger", 20)
+    flat["saturation"] = ps.get("saturation", 5.0)
+    flat["x"] = ps.get("x", 0)
+    flat["y"] = ps.get("y", 0)
+    flat["z"] = ps.get("z", 0)
+    flat["yaw"] = ps.get("yaw", 0)
+    flat["pitch"] = ps.get("pitch", 0)
+    flat["on_ground"] = ps.get("onGround", True)
+    flat["is_sprinting"] = ps.get("sprinting", False)
+    flat["is_sneaking"] = ps.get("sneaking", False)
+    flat["swimming"] = ps.get("swimming", False)
+    flat["flying"] = ps.get("flying", False)
+    flat["is_flying"] = ps.get("flying", False)
+    flat["in_water"] = ps.get("inWater", False)
+    flat["on_fire"] = ps.get("onFire", False)
+    flat["experienceLevel"] = ps.get("experienceLevel", 0)
+    flat["experienceProgress"] = ps.get("experienceProgress", 0)
+    flat["totalExperience"] = ps.get("totalExperience", 0)
+
+    # combatContext
+    cc = nested.get("combatContext", {})
+    flat["is_using_item"] = cc.get("isUsingItem", False)
+    flat["is_blocking"] = cc.get("isBlocking", False)
+    flat["activeHand"] = cc.get("activeHand", "MAIN_HAND")
+    flat["crosshair_target"] = cc.get("crosshairTarget", "MISS")
+    flat["crosshairEntityType"] = cc.get("crosshairEntityType")
+    flat["crosshairBlockPos"] = cc.get("crosshairBlockPos")
+    flat["crosshair_distance"] = cc.get("crosshairDistance", -1)
+    flat["crosshairEntityHealth"] = cc.get("crosshairEntityHealth", -1)
+    flat["crosshairEntityMaxHealth"] = cc.get("crosshairEntityMaxHealth", -1)
+
+    # playerInput
+    pi = nested.get("playerInput", {})
+    flat["movementForward"] = pi.get("movementForward", 0)
+    flat["movementSideways"] = pi.get("movementSideways", 0)
+    flat["input_jump"] = pi.get("jump", False)
+    flat["input_sprint"] = pi.get("sprint", False)
+    flat["input_sneak"] = pi.get("sneak", False)
+    flat["input_attack"] = pi.get("attack", False)
+    flat["input_use_item"] = pi.get("useItem", False)
+    flat["input_drop"] = pi.get("drop", False)
+    flat["input_swap_offhand"] = pi.get("swapOffhand", False)
+    flat["input_open_inventory"] = pi.get("openInventory", False)
+    flat["yaw_delta"] = pi.get("yawDelta", 0)
+    flat["pitch_delta"] = pi.get("pitchDelta", 0)
+
+    # screenState
+    ss = nested.get("screenState", {})
+    flat["screen_open"] = ss.get("screenOpen", False)
+    flat["screenOpen"] = ss.get("screenOpen", False)
+    flat["screen_open_type"] = ss.get("screenType")
+    flat["cursor_x"] = ss.get("cursorX", 0)
+    flat["cursorX"] = ss.get("cursorX", 0)
+    flat["cursor_y"] = ss.get("cursorY", 0)
+    flat["cursorY"] = ss.get("cursorY", 0)
+    flat["mouse_left"] = ss.get("mouseLeft", False)
+    flat["mouseLeft"] = ss.get("mouseLeft", False)
+    flat["mouse_right"] = ss.get("mouseRight", False)
+    flat["mouseRight"] = ss.get("mouseRight", False)
+    flat["shift_held"] = ss.get("shiftHeld", False)
+    flat["shiftHeld"] = ss.get("shiftHeld", False)
+
+    # statusEffects
+    se = nested.get("statusEffects", {})
+    flat["has_speed"] = se.get("speed", False)
+    flat["has_slowness"] = se.get("slowness", False)
+    flat["has_strength"] = se.get("strength", False)
+    flat["has_fire_resist"] = se.get("fireResistance", False)
+    flat["has_poison"] = se.get("poison", False)
+    flat["has_wither"] = se.get("wither", False)
+
+    # threat
+    th = nested.get("threat", {})
+    flat["target_entity_hostile"] = th.get("targetEntityHostile", False)
+    flat["target_distance"] = th.get("targetDistance", -1)
+    flat["nearest_hostile_dist"] = th.get("nearestHostileDist", -1)
+    flat["nearest_hostile_yaw"] = th.get("nearestHostileYaw", 0)
+    flat["hostile_count"] = th.get("hostileCount", 0)
+
+    return flat

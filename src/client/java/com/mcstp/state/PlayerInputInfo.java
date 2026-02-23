@@ -23,14 +23,19 @@ public class PlayerInputInfo {
     private static float prevPitch = 0;
 
     public PlayerInputInfo(ClientPlayerEntity player) {
-        net.minecraft.util.math.Vec2f movement = player.input.getMovementInput();
-        this.movementForward = movement.y;
-        this.movementSideways = movement.x;
-        this.jump = player.input.playerInput.jump();
-        this.sprint = player.input.playerInput.sprint();
-        this.sneak = player.input.playerInput.sneak();
-
         GameOptions options = MinecraftClient.getInstance().options;
+
+        // Read all inputs from key bindings directly — player.input fields
+        // may be reset by the time the state provider runs in the tick cycle
+        float fwd = options.forwardKey.isPressed() ? 1.0f : 0.0f;
+        float back = options.backKey.isPressed() ? 1.0f : 0.0f;
+        float left = options.leftKey.isPressed() ? 1.0f : 0.0f;
+        float right = options.rightKey.isPressed() ? 1.0f : 0.0f;
+        this.movementForward = fwd - back;
+        this.movementSideways = left - right;
+        this.jump = options.jumpKey.isPressed();
+        this.sprint = options.sprintKey.isPressed();
+        this.sneak = options.sneakKey.isPressed();
         this.attack = options.attackKey.isPressed();
         this.useItem = options.useKey.isPressed();
         this.drop = options.dropKey.isPressed();

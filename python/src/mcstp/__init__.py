@@ -7,6 +7,7 @@ from mcstp.state import (
     StatusEffects,
     ThreatInfo,
     HeldItemInfo,
+    flatten_state,
 )
 from mcstp.actions import Actions
 
@@ -20,4 +21,5 @@ __all__ = [
     "ThreatInfo",
     "HeldItemInfo",
     "Actions",
+    "flatten_state",
 ]

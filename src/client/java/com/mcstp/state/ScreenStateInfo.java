@@ -17,7 +17,12 @@ public class ScreenStateInfo {
     public ScreenStateInfo(MinecraftClient client) {
         Screen screen = client.currentScreen;
         this.screenOpen = screen != null;
-        this.screenType = screen != null ? screen.getClass().getSimpleName() : null;
+        if (screen != null) {
+            String title = screen.getTitle().getString();
+            this.screenType = (title != null && !title.isEmpty()) ? title : screen.getClass().getSimpleName();
+        } else {
+            this.screenType = null;
+        }
 
         long window = client.getWindow().getHandle();
         if (screen != null) {
