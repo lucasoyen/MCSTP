@@ -206,6 +206,54 @@ class ThreatInfo:
 
 
 @dataclass
+class InventorySlot:
+    slot: int = 0
+    name: str = "minecraft:air"
+    category: str = "EMPTY"
+    count: int = 0
+    max_durability: Optional[int] = None
+    durability: Optional[int] = None
+
+    @classmethod
+    def from_dict(cls, data: dict) -> InventorySlot:
+        return cls(
+            slot=data.get("slot", 0),
+            name=data.get("name", "minecraft:air"),
+            category=data.get("category", "EMPTY"),
+            count=data.get("count", 0),
+            max_durability=data.get("maxDurability"),
+            durability=data.get("durability"),
+        )
+
+
+@dataclass
+class NearbyEntity:
+    type: str = "minecraft:zombie"
+    x: float = 0
+    y: float = 0
+    z: float = 0
+    distance: float = 0
+    yaw: float = 0
+    health: float = 20
+    max_health: float = 20
+    hostile: bool = False
+
+    @classmethod
+    def from_dict(cls, data: dict) -> NearbyEntity:
+        return cls(
+            type=data.get("type", "minecraft:zombie"),
+            x=data.get("x", 0),
+            y=data.get("y", 0),
+            z=data.get("z", 0),
+            distance=data.get("distance", 0),
+            yaw=data.get("yaw", 0),
+            health=data.get("health", 20),
+            max_health=data.get("maxHealth", 20),
+            hostile=data.get("hostile", False),
+        )
+
+
+@dataclass
 class GameState:
     timestamp: int = 0
     selected_slot: int = 0
@@ -217,9 +265,13 @@ class GameState:
     screen_state: ScreenState = field(default_factory=ScreenState)
     status_effects: StatusEffects = field(default_factory=StatusEffects)
     threat: ThreatInfo = field(default_factory=ThreatInfo)
+    inventory: list[InventorySlot] = field(default_factory=list)
+    nearby_entities: list[NearbyEntity] = field(default_factory=list)
 
     @classmethod
     def from_dict(cls, data: dict) -> GameState:
+        inventory_data = data.get("inventory", [])
+        nearby_data = data.get("nearbyEntities", [])
         return cls(
             timestamp=data.get("timestamp", 0),
             selected_slot=data.get("selectedSlot", 0),
@@ -231,6 +283,8 @@ class GameState:
             screen_state=ScreenState.from_dict(data.get("screenState", {})),
             status_effects=StatusEffects.from_dict(data.get("statusEffects", {})),
             threat=ThreatInfo.from_dict(data.get("threat", {})),
+            inventory=[InventorySlot.from_dict(s) for s in inventory_data],
+            nearby_entities=[NearbyEntity.from_dict(e) for e in nearby_data],
         )
 
     def to_control_dict(self) -> dict:
@@ -385,5 +439,17 @@ def flatten_state(nested: dict) -> dict:
     flat["nearest_hostile_dist"] = th.get("nearestHostileDist", -1)
     flat["nearest_hostile_yaw"] = th.get("nearestHostileYaw", 0)
     flat["hostile_count"] = th.get("hostileCount", 0)
+
+    # inventory (kept as list - not flattened since it's variable-length)
+    inv = nested.get("inventory", [])
+    if inv:
+        flat["inventory"] = inv
+        flat["inventory_count"] = len(inv)
+
+    # nearbyEntities (kept as list - not flattened since it's variable-length)
+    ents = nested.get("nearbyEntities", [])
+    if ents:
+        flat["nearby_entities"] = ents
+        flat["nearby_entity_count"] = len(ents)
 
     return flat

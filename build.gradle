@@ -11,6 +11,7 @@ base {
 
 repositories {
     mavenCentral()
+    maven { url "https://maven.terraformersmc.com/" }
 }
 
 loom {
@@ -35,6 +36,9 @@ dependencies {
 
     // Netty HTTP codec (bundled via MCCTP at runtime, needed for compile)
     implementation "io.netty:netty-codec-http:4.1.97.Final"
+
+    // ModMenu (optional) - in-game config GUI
+    modCompileOnly("com.terraformersmc:modmenu:17.0.0-beta.2") { transitive = false }
 }
 
 processResources {

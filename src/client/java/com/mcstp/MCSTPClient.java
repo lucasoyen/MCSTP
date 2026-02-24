@@ -19,7 +19,7 @@ public class MCSTPClient implements ClientModInitializer {
         MCCTPApi.registerModule("mcstp");
 
         // Register state provider
-        StateProviderRegistry.register(new MCSTPStateProvider());
+        StateProviderRegistry.register(new MCSTPStateProvider(config));
 
         // Register action handlers
         ActionDispatcher dispatcher = MCCTPApi.getActionDispatcher();

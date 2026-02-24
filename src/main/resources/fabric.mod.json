@@ -11,7 +11,8 @@
   "environment": "*",
   "entrypoints": {
     "main": ["com.mcstp.MCSTPMod"],
-    "client": ["com.mcstp.MCSTPClient"]
+    "client": ["com.mcstp.MCSTPClient"],
+    "modmenu": ["com.mcstp.config.ModMenuIntegration"]
   },
   "mixins": [
     "mcstp.mixins.json",
@@ -26,5 +27,8 @@
     "minecraft": "~1.21.11",
     "java": ">=21",
     "fabric-api": "*"
+  },
+  "suggests": {
+    "modmenu": ">=12.0.0"
   }
 }
