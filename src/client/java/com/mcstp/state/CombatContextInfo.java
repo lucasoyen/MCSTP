@@ -7,6 +7,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.registry.Registries;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
@@ -23,11 +24,23 @@ public class CombatContextInfo {
     public final float crosshairEntityHealth;
     public final float crosshairEntityMaxHealth;
     public final double crosshairDistance;
+    public final float attackCooldown;
+    public final float itemUseProgress;
+    public final boolean recentlyHurt;
 
     public CombatContextInfo(ClientPlayerEntity player) {
         this.isUsingItem = player.isUsingItem();
         this.isBlocking = player.isBlocking();
         this.activeHand = player.getActiveHand() == Hand.MAIN_HAND ? "MAIN_HAND" : "OFF_HAND";
+        this.attackCooldown = player.getAttackCooldownProgress(0.0f);
+        if (player.isUsingItem()) {
+            ItemStack active = player.getActiveItem();
+            int maxUse = active.getMaxUseTime(player);
+            this.itemUseProgress = maxUse > 0 ? 1.0f - (float) player.getItemUseTimeLeft() / maxUse : 0.0f;
+        } else {
+            this.itemUseProgress = 0.0f;
+        }
+        this.recentlyHurt = player.hurtTime > 0;
 
         MinecraftClient client = MinecraftClient.getInstance();
         HitResult hitResult = client.crosshairTarget;
@@ -82,6 +95,9 @@ public class CombatContextInfo {
             json.addProperty("crosshairEntityHealth", crosshairEntityHealth);
             json.addProperty("crosshairEntityMaxHealth", crosshairEntityMaxHealth);
         }
+        json.addProperty("attackCooldown", Math.round(attackCooldown * 100.0f) / 100.0f);
+        json.addProperty("itemUseProgress", Math.round(itemUseProgress * 100.0f) / 100.0f);
+        json.addProperty("recentlyHurt", recentlyHurt);
         return json;
     }
 }

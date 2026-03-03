@@ -6,6 +6,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
+import net.minecraft.world.GameMode;
 
 public class GameStatePayload {
 
@@ -14,6 +15,13 @@ public class GameStatePayload {
         if (player == null) return null;
 
         JsonObject payload = new JsonObject();
+
+        // Top-level environment fields (always included when playerState is on)
+        if (config.isModuleEnabled("playerState")) {
+            GameMode gm = client.interactionManager != null ? client.interactionManager.getCurrentGameMode() : GameMode.SURVIVAL;
+            payload.addProperty("gameMode", gm.name().toLowerCase());
+            payload.addProperty("timeOfDay", client.world != null ? client.world.getTimeOfDay() % 24000 : 0);
+        }
 
         if (config.isModuleEnabled("heldItem")) {
             int selectedSlot = player.getInventory().getSelectedSlot();

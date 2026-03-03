@@ -44,6 +44,12 @@ class PlayerState:
     experience_level: int = 0
     experience_progress: float = 0
     total_experience: int = 0
+    armor: int = 0
+    fall_distance: float = 0
+    velocity_y: float = 0
+    horizontal_collision: bool = False
+    climbing: bool = False
+    recently_hurt: bool = False
 
     @classmethod
     def from_dict(cls, data: dict) -> PlayerState:
@@ -67,6 +73,12 @@ class PlayerState:
             experience_level=data.get("experienceLevel", 0),
             experience_progress=data.get("experienceProgress", 0),
             total_experience=data.get("totalExperience", 0),
+            armor=data.get("armor", 0),
+            fall_distance=data.get("fallDistance", 0),
+            velocity_y=data.get("velocityY", 0),
+            horizontal_collision=data.get("horizontalCollision", False),
+            climbing=data.get("climbing", False),
+            recently_hurt=data.get("recentlyHurt", False),
         )
 
 
@@ -81,6 +93,9 @@ class CombatContext:
     crosshair_distance: float = -1
     crosshair_entity_health: float = -1
     crosshair_entity_max_health: float = -1
+    attack_cooldown: float = 1.0
+    item_use_progress: float = 0.0
+    recently_hurt: bool = False
 
     @classmethod
     def from_dict(cls, data: dict) -> CombatContext:
@@ -94,6 +109,9 @@ class CombatContext:
             crosshair_distance=data.get("crosshairDistance", -1),
             crosshair_entity_health=data.get("crosshairEntityHealth", -1),
             crosshair_entity_max_health=data.get("crosshairEntityMaxHealth", -1),
+            attack_cooldown=data.get("attackCooldown", 1.0),
+            item_use_progress=data.get("itemUseProgress", 0.0),
+            recently_hurt=data.get("recentlyHurt", False),
         )
 
 
@@ -257,6 +275,8 @@ class NearbyEntity:
 class GameState:
     timestamp: int = 0
     selected_slot: int = 0
+    game_mode: str = "survival"
+    time_of_day: int = 0
     held_item: HeldItemInfo = field(default_factory=HeldItemInfo)
     offhand_item: HeldItemInfo = field(default_factory=HeldItemInfo)
     player_state: PlayerState = field(default_factory=PlayerState)
@@ -275,6 +295,8 @@ class GameState:
         return cls(
             timestamp=data.get("timestamp", 0),
             selected_slot=data.get("selectedSlot", 0),
+            game_mode=data.get("gameMode", "survival"),
+            time_of_day=data.get("timeOfDay", 0),
             held_item=HeldItemInfo.from_dict(data.get("heldItem", {})),
             offhand_item=HeldItemInfo.from_dict(data.get("offhandItem", {})),
             player_state=PlayerState.from_dict(data.get("playerState", {})),
@@ -346,6 +368,8 @@ def flatten_state(nested: dict) -> dict:
             flat[key] = nested[key]
     flat["selected_slot"] = nested.get("selectedSlot", 0)
     flat["selectedSlot"] = nested.get("selectedSlot", 0)
+    flat["game_mode"] = nested.get("gameMode", "survival")
+    flat["time_of_day"] = nested.get("timeOfDay", 0)
 
     # heldItem
     hi = nested.get("heldItem", {})
@@ -379,6 +403,13 @@ def flatten_state(nested: dict) -> dict:
     flat["experienceLevel"] = ps.get("experienceLevel", 0)
     flat["experienceProgress"] = ps.get("experienceProgress", 0)
     flat["totalExperience"] = ps.get("totalExperience", 0)
+    flat["armor"] = ps.get("armor", 0)
+    flat["fall_distance"] = ps.get("fallDistance", 0.0)
+    flat["velocity_y"] = ps.get("velocityY", 0.0)
+    flat["horizontal_collision"] = ps.get("horizontalCollision", False)
+    flat["is_climbing"] = ps.get("climbing", False)
+    flat["climbing"] = ps.get("climbing", False)
+    flat["recently_hurt"] = ps.get("recentlyHurt", False)
 
     # combatContext
     cc = nested.get("combatContext", {})
@@ -391,10 +422,17 @@ def flatten_state(nested: dict) -> dict:
     flat["crosshair_distance"] = cc.get("crosshairDistance", -1)
     flat["crosshairEntityHealth"] = cc.get("crosshairEntityHealth", -1)
     flat["crosshairEntityMaxHealth"] = cc.get("crosshairEntityMaxHealth", -1)
+    flat["attack_cooldown"] = cc.get("attackCooldown", 1.0)
+    flat["item_use_progress"] = cc.get("itemUseProgress", 0.0)
+    # recentlyHurt can come from combatContext or playerState
+    if "recentlyHurt" in cc:
+        flat["recently_hurt"] = cc["recentlyHurt"]
 
     # playerInput
     pi = nested.get("playerInput", {})
+    flat["movement_forward"] = pi.get("movementForward", 0)
     flat["movementForward"] = pi.get("movementForward", 0)
+    flat["movement_sideways"] = pi.get("movementSideways", 0)
     flat["movementSideways"] = pi.get("movementSideways", 0)
     flat["input_jump"] = pi.get("jump", False)
     flat["input_sprint"] = pi.get("sprint", False)

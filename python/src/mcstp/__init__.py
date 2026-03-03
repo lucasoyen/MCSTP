@@ -11,7 +11,6 @@ from mcstp.state import (
     NearbyEntity,
     flatten_state,
 )
-from mcstp.actions import Actions
 
 __all__ = [
     "GameState",
@@ -24,6 +23,5 @@ __all__ = [
     "HeldItemInfo",
     "InventorySlot",
     "NearbyEntity",
-    "Actions",
     "flatten_state",
 ]

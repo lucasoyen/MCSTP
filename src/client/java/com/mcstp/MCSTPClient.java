@@ -1,10 +1,7 @@
 package com.mcstp;
 
-import com.mcctp.action.ActionDispatcher;
 import com.mcctp.api.MCCTPApi;
 import com.mcctp.api.StateProviderRegistry;
-import com.mcstp.action.handlers.ClickHandler;
-import com.mcstp.action.handlers.CursorHandler;
 import com.mcstp.config.MCSTPConfig;
 import com.mcstp.state.MCSTPStateProvider;
 import net.fabricmc.api.ClientModInitializer;
@@ -18,13 +15,8 @@ public class MCSTPClient implements ClientModInitializer {
         // Register module with MCCTP
         MCCTPApi.registerModule("mcstp");
 
-        // Register state provider
+        // Register state provider (telemetry only - controls live in MCCTP)
         StateProviderRegistry.register(new MCSTPStateProvider(config));
-
-        // Register action handlers
-        ActionDispatcher dispatcher = MCCTPApi.getActionDispatcher();
-        dispatcher.registerHandler("cursor", new CursorHandler());
-        dispatcher.registerHandler("click", new ClickHandler());
 
         // Set tick interval
         MCCTPApi.setTickInterval(config.getTickInterval());

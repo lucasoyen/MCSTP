@@ -2,6 +2,7 @@ package com.mcstp.state;
 
 import com.google.gson.JsonObject;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.util.math.Vec3d;
 
 public class PlayerStateInfo {
     public final float health;
@@ -23,6 +24,12 @@ public class PlayerStateInfo {
     public final int experienceLevel;
     public final float experienceProgress;
     public final int totalExperience;
+    public final int armor;
+    public final double fallDistance;
+    public final double velocityY;
+    public final boolean horizontalCollision;
+    public final boolean climbing;
+    public final boolean recentlyHurt;
 
     public PlayerStateInfo(ClientPlayerEntity player) {
         this.health = player.getHealth();
@@ -44,6 +51,13 @@ public class PlayerStateInfo {
         this.experienceLevel = player.experienceLevel;
         this.experienceProgress = player.experienceProgress;
         this.totalExperience = player.totalExperience;
+        this.armor = player.getArmor();
+        this.fallDistance = player.fallDistance;
+        Vec3d vel = player.getVelocity();
+        this.velocityY = vel.y;
+        this.horizontalCollision = player.horizontalCollision;
+        this.climbing = player.isClimbing();
+        this.recentlyHurt = player.hurtTime > 0;
     }
 
     public JsonObject toJson() {
@@ -67,6 +81,12 @@ public class PlayerStateInfo {
         json.addProperty("experienceLevel", experienceLevel);
         json.addProperty("experienceProgress", experienceProgress);
         json.addProperty("totalExperience", totalExperience);
+        json.addProperty("armor", armor);
+        json.addProperty("fallDistance", Math.round(fallDistance * 100.0) / 100.0);
+        json.addProperty("velocityY", Math.round(velocityY * 1000.0) / 1000.0);
+        json.addProperty("horizontalCollision", horizontalCollision);
+        json.addProperty("climbing", climbing);
+        json.addProperty("recentlyHurt", recentlyHurt);
         return json;
     }
 }

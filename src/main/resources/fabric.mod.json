@@ -7,7 +7,7 @@
   "authors": ["Forkei"],
   "contact": {},
   "license": "MIT",
-  "icon": "",
+  "icon": "assets/mcstp/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": ["com.mcstp.MCSTPMod"],
